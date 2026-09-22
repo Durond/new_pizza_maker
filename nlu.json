@@ -56,13 +56,13 @@
     "slots" : [ {
       "name" : "pizza_type",
       "entity" : "pizza_type",
-      "required" : true,
+      "required" : false,
       "prompts" : [ "Какую пиццу вы хотите ?" ],
       "array" : false
     }, {
       "name" : "pizza_size",
       "entity" : "pizza_size",
-      "required" : true,
+      "required" : false,
       "prompts" : [ "Какой размер ?" ],
       "array" : false
     } ],
@@ -87,7 +87,7 @@
     "slots" : [ {
       "name" : "topping",
       "entity" : "topping",
-      "required" : true,
+      "required" : false,
       "prompts" : [ ],
       "array" : false
     } ],
@@ -166,7 +166,7 @@
     "slots" : [ {
       "name" : "payment_method",
       "entity" : "payment_method",
-      "required" : true,
+      "required" : false,
       "prompts" : [ "Как будете оплачивать?" ],
       "array" : false
     } ],
@@ -343,7 +343,7 @@
     "slots" : [ {
       "name" : "pizza_size",
       "entity" : "pizza_size",
-      "required" : true,
+      "required" : false,
       "prompts" : [ "Какой размер?" ],
       "array" : false
     } ],
@@ -368,7 +368,7 @@
     "slots" : [ {
       "name" : "crust_type",
       "entity" : "crust_type",
-      "required" : true,
+      "required" : false,
       "prompts" : [ "Какой борт?" ],
       "array" : false
     } ],
@@ -395,7 +395,7 @@
     "slots" : [ {
       "name" : "address",
       "entity" : "address",
-      "required" : true,
+      "required" : false,
       "prompts" : [ ],
       "array" : false
     } ],

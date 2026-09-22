@@ -1,28 +1,45 @@
 require: slotfilling/slotFilling.sc
     module = sys.zb-common
 
+init:
+    $global.pizza_prices = {
+        "15": 300, "25": 500, "30": 700, "35": 900
+    };
+    $global.crust_prices = {
+        "обычный": 0, "сырный": 100, "колбасный": 150
+    };
+
 theme: /
 
     # =========================
-    # СТАРТ
+    # ПРИВЕТСТВИЕ / НАЧАЛО
     # =========================
-    state: Start
-        intent!: /start
+    state: StartState
         q!: $regex</start>
+        intent!: /start
         script:
+            $session.order = null;
             $session.order = {
-                pizza_type: null, pizza_size: null,
-                crust_type: null, address: null,
-                phone: null, payment_method: null,
-                status: "draft"
+                pizza_type: null,
+                pizza_size: null,
+                crust_type: null,
+                toppings: [],
+                address: null,
+                payment_method: null,
+                status: "draft",
+                total: 0
             };
-        a: Здравствуйте! Я помогу заказать пиццу 🍕
+        random:
+            a: Здравствуйте! Я помогу заказать пиццу 🍕
+            a: Привет! Готов принять ваш заказ на пиццу 🍕
+            a: Добрый день! Давайте закажем пиццу 🍕
         buttons:
             "Заказать пиццу" -> /OrderPizza
             "Помощь" -> /Help
+            "Сбросить" -> /Reset
 
     # =========================
-    # ГЛАВНЫЙ ПОТОК
+    # ЗАКАЗ — ВЛОЖЕННЫЕ СОСТОЯНИЯ
     # =========================
     state: OrderPizza
         intent!: /order_pizza
@@ -30,9 +47,9 @@ theme: /
             if (!$session.order) {
                 $session.order = {
                     pizza_type: null, pizza_size: null,
-                    crust_type: null, address: null,
-                    phone: null, payment_method: null,
-                    status: "draft"
+                    crust_type: null, toppings: [],
+                    address: null, payment_method: null,
+                    status: "draft", total: 0
                 };
             }
             var p = $parseTree._pizza_type;
@@ -40,131 +57,127 @@ theme: /
             if (p) { $session.order.pizza_type = p.value; }
             if (s) { $session.order.pizza_size = s.value; }
         a: Отлично! Давайте оформим заказ.
-        go!: /CheckPizzaType
+        go!: /OrderPizza/CheckPizzaType
 
-    state: CheckPizzaType
-        script:
-            if ($session.order.pizza_type) {
-                $reactions.transition("/CheckSize");
-            } else {
-                $reactions.transition("/AskPizzaType");
-            }
+        # ----- Проверка типа пиццы -----
+        state: CheckPizzaType
+            script:
+                if ($session.order.pizza_type) {
+                    $reactions.transition("/OrderPizza/CheckSize");
+                } else {
+                    $reactions.transition("/OrderPizza/AskPizzaType");
+                }
 
-    # ---------- ТИП ПИЦЦЫ ----------
-    state: AskPizzaType
-        a: Какую пиццу хотите?
-        buttons:
-            "Мясная" -> /SavePizzaType
-            "Сырная" -> /SavePizzaType
-            "Грибная" -> /SavePizzaType
-            "Вегетарианская" -> /SavePizzaType
+        # ----- Спрашиваем тип -----
+        state: AskPizzaType
+            a: Какую пиццу хотите?
+            buttons:
+                "Мясная" -> /OrderPizza/SavePizzaType
+                "Сырная" -> /OrderPizza/SavePizzaType
+                "Грибная" -> /OrderPizza/SavePizzaType
+                "Вегетарианская" -> /OrderPizza/SavePizzaType
+                "Гавайская" -> /OrderPizza/SavePizzaType
 
-    state: SavePizzaType
-        intent!: /choose_pizza
-        q!: мясная
-        q!: сырная
-        q!: грибная
-        q!: вегетарианская
-        script:
-            var p = $parseTree._pizza_type;
-            if (p) {
-                $session.order.pizza_type = p.value;
-            } else {
-                $session.order.pizza_type = $request.query.toLowerCase();
-            }
-        a: {{$session.order.pizza_type}} — отличный выбор!
-        go!: /CheckSize
+        # ----- Локальный интент сохранения типа -----
+        state: SavePizzaType
+            intent!: /choose_pizza
+            q!: мясная
+            q!: сырная
+            q!: грибная
+            q!: вегетарианская
+            q!: гавайская
+            script:
+                var p = $parseTree._pizza_type;
+                if (p) {
+                    $session.order.pizza_type = p.value;
+                } else {
+                    $session.order.pizza_type = $request.query.toLowerCase();
+                }
+            a: {{$session.order.pizza_type}} — отличный выбор!
+            go!: /OrderPizza/CheckSize
 
-    state: CheckSize
-        script:
-            if ($session.order.pizza_size) {
-                $reactions.transition("/CheckCrust");
-            } else {
-                $reactions.transition("/AskSize");
-            }
+        # ----- Проверка размера -----
+        state: CheckSize
+            script:
+                if ($session.order.pizza_size) {
+                    $reactions.transition("/OrderPizza/CheckCrust");
+                } else {
+                    $reactions.transition("/OrderPizza/AskSize");
+                }
 
-    # ---------- РАЗМЕР ----------
-    state: AskSize
-        a: Какой размер пиццы?
-        buttons:
-            "15 см" -> /SaveSize
-            "25 см" -> /SaveSize
-            "30 см" -> /SaveSize
-            "35 см" -> /SaveSize
+        # ----- Спрашиваем размер -----
+        state: AskSize
+            a: Какой размер пиццы?
+            buttons:
+                "15 см" -> /OrderPizza/SaveSize
+                "25 см" -> /OrderPizza/SaveSize
+                "30 см" -> /OrderPizza/SaveSize
+                "35 см" -> /OrderPizza/SaveSize
 
-    state: SaveSize
-        intent!: /choose_size
-        q!: 15 см
-        q!: 25 см
-        q!: 30 см
-        q!: 35 см
-        script:
-            var s = $parseTree._pizza_size;
-            if (s) {
-                $session.order.pizza_size = s.value;
-            } else {
-                $session.order.pizza_size = $request.query;
-            }
-        a: Размер {{$session.order.pizza_size}} — отлично!
-        go!: /AskCrust
+        state: SaveSize
+            intent!: /choose_size
+            q!: 15 см
+            q!: 25 см
+            q!: 30 см
+            q!: 35 см
+            script:
+                var s = $parseTree._pizza_size;
+                if (s) {
+                    $session.order.pizza_size = s.value;
+                } else {
+                    $session.order.pizza_size = $request.query;
+                }
+            a: Размер {{$session.order.pizza_size}} — отлично!
+            go!: /OrderPizza/CheckCrust
 
-    # ---------- БОРТ ----------
-    state: AskCrust
-        a: Какой борт?
-        buttons:
-            "Обычный" -> /SaveCrust
-            "Сырный" -> /SaveCrust
+        # ----- Проверка борта -----
+        state: CheckCrust
+            script:
+                if ($session.order.crust_type) {
+                    $reactions.transition("/OrderPizza/AskAddress");
+                } else {
+                    $reactions.transition("/OrderPizza/AskCrust");
+                }
 
-    state: SaveCrust
-        intent!: /choose_crust
-        q!: обычный
-        q!: сырный
-        script:
-            var c = $parseTree._crust_type;
-            if (c) {
-                $session.order.crust_type = c.value;
-            } else {
-                $session.order.crust_type = $request.query.toLowerCase();
-            }
-        a: Борт: {{$session.order.crust_type}}.
-        go!: /AskAddress
+        # ----- Спрашиваем борт -----
+        state: AskCrust
+            a: Какой борт?
+            buttons:
+                "Обычный" -> /OrderPizza/SaveCrust
+                "Сырный" -> /OrderPizza/SaveCrust
+                "Колбасный" -> /OrderPizza/SaveCrust
+
+        state: SaveCrust
+            intent!: /choose_crust
+            q!: обычный
+            q!: сырный
+            q!: колбасный
+            script:
+                var c = $parseTree._crust_type;
+                if (c) {
+                    $session.order.crust_type = c.value;
+                } else {
+                    $session.order.crust_type = $request.query.toLowerCase();
+                }
+            a: Борт: {{$session.order.crust_type}}.
+            go!: /OrderPizza/AskAddress
+
+        # ----- Адрес (универсальный приёмник) -----
+        state: AskAddress
+            script:
+                $session.order.status = "waiting_address";
+            a: Куда доставить?
+            go!: /WaitInput
 
     # =========================
-    # АДРЕС
-    # =========================
-    state: AskAddress
-        script:
-            $session.order.status = "waiting_address";
-        a: Куда доставить?
-        go!: /WaitInput
-
-    # =========================
-    # ТЕЛЕФОН
-    # =========================
-    state: AskPhone
-        script:
-            $session.order.status = "waiting_phone";
-        a: Ваш номер телефона?
-        go!: /WaitInput
-
-    # =========================
-    # УНИВЕРСАЛЬНЫЙ ПРИЁМНИК
+    # АДРЕС — ПРИЁМНИК
     # =========================
     state: WaitInput
         q!: *
         script:
-            var st = $session.order.status;
-            if (st == "waiting_address") {
-                $session.order.address = $request.query;
-                $session.order.status = "draft";
-                $reactions.transition("/AskPhone");
-            } else if (st == "waiting_phone") {
-                $session.order.phone = $request.query;
-                $session.order.status = "draft";
-                $reactions.transition("/AskPayment");
-            } else {
-                $reactions.transition("/NoMatch");
-            }
+            $session.order.address = $request.query;
+            $session.order.status = "draft";
+            $reactions.transition("/AskPayment");
 
     # =========================
     # ОПЛАТА
@@ -195,25 +208,33 @@ theme: /
         go!: /ConfirmOrder
 
     # =========================
-    # ПОДТВЕРЖДЕНИЕ
+    # ПОДТВЕРЖДЕНИЕ ЗАКАЗА
     # =========================
     state: ConfirmOrder
+        script:
+            # подсчёт стоимости
+            var size = $session.order.pizza_size;
+            var crust = $session.order.crust_type;
+            var base = $global.pizza_prices[size] || 0;
+            var crustPrice = $global.crust_prices[crust] || 0;
+            $session.order.total = base + crustPrice;
         a: |
             Ваш заказ:
             🍕 Пицца: {{$session.order.pizza_type}}
-            📏 Размер: {{$session.order.pizza_size}}
+            📏 Размер: {{$session.order.pizza_size}} см
             🧀 Борт: {{$session.order.crust_type}}
             📍 Адрес: {{$session.order.address}}
-            📞 Телефон: {{$session.order.phone}}
             💳 Оплата: {{$session.order.payment_method}}
+            💰 Итого: {{$session.order.total}} ₽
 
             Всё верно?
         buttons:
             "Да, оформить" -> /ConfirmOrder/PlaceOrder
             "Изменить размер" -> /ChangeSize
-            "Изменить адрес" -> /AskAddress
+            "Изменить адрес" -> /OrderPizza/AskAddress
             "Отмена" -> /Cancel
 
+        # ----- Подтверждение (вложено!) -----
         state: PlaceOrder
             intent!: /confirm_yes
             q!: да
@@ -224,30 +245,56 @@ theme: /
             script:
                 $session.order.status = "confirmed";
             a: Заказ оформлен! Мы позвоним в течение 5 минут.
-            go!: /Thanks
+            go!: /OrderInProgress
 
     # =========================
-    # ИЗМЕНЕНИЕ РАЗМЕРА
+    # ИМИТАЦИЯ ВЫПОЛНЕНИЯ ЗАКАЗА
+    # =========================
+    state: OrderInProgress
+        a: Готовим вашу пиццу... 🍕
+        timeout: 3000
+        go!: /OrderReady
+
+    state: OrderReady
+        a: Ваш заказ готов! Курьер выехал по адресу {{$session.order.address}}.
+        image: https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/320px-Eq_it-na_pizza-margherita_sep2005_sml.jpg
+        go!: /Thanks
+
+    # =========================
+    # ИЗМЕНЕНИЕ ЗАКАЗА
     # =========================
     state: ChangeSize
         intent!: /change_size
         a: Какой размер хотите?
         buttons:
-            "15 см" -> /SaveSize
-            "25 см" -> /SaveSize
-            "30 см" -> /SaveSize
-            "35 см" -> /SaveSize
+            "15 см" -> /OrderPizza/SaveSize
+            "25 см" -> /OrderPizza/SaveSize
+            "30 см" -> /OrderPizza/SaveSize
+            "35 см" -> /OrderPizza/SaveSize
 
     # =========================
     # ФИНАЛ
     # =========================
     state: Thanks
         a: Спасибо за заказ! Хорошего дня 🍕
-        script:
-            $jsapi.stopSession();
+        go!: /Reset
 
     # =========================
-    # ОТМЕНА / СБРОС
+    # СБРОС СЕССИИ
+    # =========================
+    state: Reset
+        intent!: /reset
+        q!: заново
+        q!: с начала
+        q!: сбросить
+        script:
+            $session.order = null;
+            $jsapi.stopSession();
+        a: Начинаем заново. Напишите «привет».
+        go!: /StartState
+
+    # =========================
+    # ОТМЕНА
     # =========================
     state: Cancel
         intent!: /cancel
@@ -255,18 +302,7 @@ theme: /
         q!: отменить
         q!: стоп
         a: Заказ отменён. Возвращайтесь!
-        script:
-            $jsapi.stopSession();
-
-    state: Reset
-        intent!: /reset
-        q!: заново
-        q!: с начала
-        q!: сбросить
-        script:
-            $jsapi.stopSession();
-        a: Начинаем заново.
-        go!: /Start
+        go!: /Reset
 
     # =========================
     # ПОМОЩЬ / СПАСИБО / ПОКА
@@ -276,9 +312,10 @@ theme: /
         a: |
             Я умею:
             • принимать заказ пиццы
-            • выбирать размер и борт
+            • выбирать размер, борт, топпинги
             • оформлять доставку
-            Просто напишите «хочу пиццу» или нажмите кнопку ниже.
+            • менять заказ
+            Напишите «хочу пиццу» или нажмите кнопку.
         buttons:
             "Заказать пиццу" -> /OrderPizza
 
@@ -293,13 +330,12 @@ theme: /
         q!: пока
         q!: до свидания
         a: До свидания! Ждём вас снова.
-        script:
-            $jsapi.stopSession();
+        go!: /Reset
 
     # =========================
     # NO MATCH
     # =========================
     state: NoMatch
         event!: noMatch
-        if: !($session.order && ($session.order.status == "waiting_address" || $session.order.status == "waiting_phone"))
+        if: !($session.order && $session.order.status == "waiting_address")
         a: Я не понял. Вы сказали: {{$request.query}}
