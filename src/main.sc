@@ -3,6 +3,9 @@ require: slotfilling/slotFilling.sc
 
 theme: /
 
+    # =========================
+    # СТАРТ
+    # =========================
     state: Start
         intent!: /start
         q!: $regex</start>
@@ -18,6 +21,9 @@ theme: /
             "Заказать пиццу" -> /OrderPizza
             "Помощь" -> /Help
 
+    # =========================
+    # ГЛАВНЫЙ ПОТОК
+    # =========================
     state: OrderPizza
         intent!: /order_pizza
         script:
@@ -44,6 +50,7 @@ theme: /
                 $reactions.transition("/AskPizzaType");
             }
 
+    # ---------- ТИП ПИЦЦЫ ----------
     state: AskPizzaType
         a: Какую пиццу хотите?
         buttons:
@@ -76,6 +83,7 @@ theme: /
                 $reactions.transition("/AskSize");
             }
 
+    # ---------- РАЗМЕР ----------
     state: AskSize
         a: Какой размер пиццы?
         buttons:
@@ -100,6 +108,7 @@ theme: /
         a: Размер {{$session.order.pizza_size}} — отлично!
         go!: /AskCrust
 
+    # ---------- БОРТ ----------
     state: AskCrust
         a: Какой борт?
         buttons:
@@ -120,36 +129,46 @@ theme: /
         a: Борт: {{$session.order.crust_type}}.
         go!: /AskAddress
 
+    # =========================
+    # АДРЕС
+    # =========================
     state: AskAddress
+        script:
+            $session.order.status = "waiting_address";
         a: Куда доставить?
+        go!: /WaitInput
 
-    state: SaveAddress
-        intent!: /set_address
-        script:
-            var a = $parseTree._address;
-            if (a) {
-                $session.order.address = a.value;
-            } else {
-                $session.order.address = $request.query;
-            }
-        a: Адрес: {{$session.order.address}}.
-        go!: /AskPhone
-
+    # =========================
+    # ТЕЛЕФОН
+    # =========================
     state: AskPhone
-        a: Ваш номер телефона?
-
-    state: SavePhone
-        intent!: /set_phone
         script:
-            var p = $parseTree._phone;
-            if (p) {
-                $session.order.phone = p.value;
-            } else {
-                $session.order.phone = $request.query;
-            }
-        a: Записал номер: {{$session.order.phone}}.
-        go!: /AskPayment
+            $session.order.status = "waiting_phone";
+        a: Ваш номер телефона?
+        go!: /WaitInput
 
+    # =========================
+    # УНИВЕРСАЛЬНЫЙ ПРИЁМНИК ВВОДА
+    # =========================
+    state: WaitInput
+        q!: *
+        script:
+            var st = $session.order.status;
+            if (st == "waiting_address") {
+                $session.order.address = $request.query;
+                $session.order.status = "draft";
+                $reactions.transition("/AskPhone");
+            } else if (st == "waiting_phone") {
+                $session.order.phone = $request.query;
+                $session.order.status = "draft";
+                $reactions.transition("/AskPayment");
+            } else {
+                $reactions.transition("/NoMatch");
+            }
+
+    # =========================
+    # ОПЛАТА
+    # =========================
     state: AskPayment
         a: Как будете оплачивать?
         buttons:
@@ -164,6 +183,7 @@ theme: /
         q!: наличными
         q!: наличные
         q!: онлайн
+        q!: *
         script:
             var pm = $parseTree._payment_method;
             if (pm) {
@@ -174,6 +194,9 @@ theme: /
         a: Способ оплаты: {{$session.order.payment_method}}.
         go!: /ConfirmOrder
 
+    # =========================
+    # ПОДТВЕРЖДЕНИЕ
+    # =========================
     state: ConfirmOrder
         a: |
             Ваш заказ:
@@ -186,11 +209,26 @@ theme: /
 
             Всё верно?
         buttons:
-            "Да, оформить" -> /PlaceOrder
+            "Да, оформить" -> /ConfirmOrder/PlaceOrder
             "Изменить размер" -> /ChangeSize
             "Изменить адрес" -> /AskAddress
             "Отмена" -> /Cancel
 
+        state: PlaceOrder
+            intent!: /confirm_yes
+            q!: да
+            q!: да, оформить
+            q!: верно
+            q!: подтверждаю
+            q!: ок
+            script:
+                $session.order.status = "confirmed";
+            a: Заказ оформлен! Мы позвоним в течение 5 минут.
+            go!: /Thanks
+
+    # =========================
+    # ИЗМЕНЕНИЕ РАЗМЕРА
+    # =========================
     state: ChangeSize
         intent!: /change_size
         a: Какой размер хотите?
@@ -200,22 +238,17 @@ theme: /
             "30 см" -> /SaveSize
             "35 см" -> /SaveSize
 
-    state: PlaceOrder
-        intent!: /confirm_yes
-        q!: да
-        q!: да, оформить
-        q!: подтверждаю
-        q!: ок
-        script:
-            $session.order.status = "confirmed";
-        a: Заказ оформлен! Мы позвоним в течение 5 минут.
-        go!: /Thanks
-
+    # =========================
+    # ФИНАЛ
+    # =========================
     state: Thanks
         a: Спасибо за заказ! Хорошего дня 🍕
         script:
             $jsapi.stopSession();
 
+    # =========================
+    # ОТМЕНА / СБРОС
+    # =========================
     state: Cancel
         intent!: /cancel
         q!: отмена
@@ -235,6 +268,9 @@ theme: /
         a: Начинаем заново.
         go!: /Start
 
+    # =========================
+    # ПОМОЩЬ / СПАСИБО / ПОКА
+    # =========================
     state: Help
         intent!: /help
         a: |
@@ -260,6 +296,10 @@ theme: /
         script:
             $jsapi.stopSession();
 
+    # =========================
+    # NO MATCH
+    # =========================
     state: NoMatch
         event!: noMatch
+        if: !($session.order && ($session.order.status == "waiting_address" || $session.order.status == "waiting_phone"))
         a: Я не понял. Вы сказали: {{$request.query}}

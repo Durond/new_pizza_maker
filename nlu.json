@@ -392,7 +392,13 @@
       "refs" : [ ]
     },
     "patterns" : [ ],
-    "slots" : [ ],
+    "slots" : [ {
+      "name" : "address",
+      "entity" : "address",
+      "required" : true,
+      "prompts" : [ ],
+      "array" : false
+    } ],
     "priority" : 0
   } ],
   "entities" : [ {
@@ -502,6 +508,33 @@
     }, {
       "type" : "synonyms",
       "rule" : [ "ананас" ],
+      "value" : ""
+    } ]
+  }, {
+    "entity" : {
+      "name" : "address",
+      "enabled" : true,
+      "shared" : false,
+      "type" : "annotation",
+      "priority" : 1,
+      "noSpelling" : true,
+      "noMorph" : false,
+      "phoneticSearch" : false,
+      "fuzzySearch" : false,
+      "client" : false,
+      "hidden" : false
+    },
+    "records" : [ {
+      "type" : "synonyms",
+      "rule" : [ "ул Ленина 25", "Ленина 25" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "проспект Мира 10" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ " Ул Садовая 5" ],
       "value" : ""
     } ]
   }, {
