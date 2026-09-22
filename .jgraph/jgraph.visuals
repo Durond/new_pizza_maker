@@ -1,0 +1,10 @@
+{
+  "version" : 1,
+  "data" : {
+    "connectors" : {
+      "from" : [ ],
+      "to" : [ ]
+    },
+    "collapsedStates" : [ ]
+  }
+}
