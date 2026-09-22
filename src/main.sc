@@ -18,12 +18,10 @@ theme: /
         q!: $regex</start>
         intent!: /start
         script:
-            $session.order = null;
             $session.order = {
                 pizza_type: null,
                 pizza_size: null,
                 crust_type: null,
-                toppings: [],
                 address: null,
                 payment_method: null,
                 status: "draft",
@@ -47,9 +45,8 @@ theme: /
             if (!$session.order) {
                 $session.order = {
                     pizza_type: null, pizza_size: null,
-                    crust_type: null, toppings: [],
-                    address: null, payment_method: null,
-                    status: "draft", total: 0
+                    crust_type: null, address: null,
+                    payment_method: null, status: "draft", total: 0
                 };
             }
             var p = $parseTree._pizza_type;
@@ -78,7 +75,7 @@ theme: /
                 "Вегетарианская" -> /OrderPizza/SavePizzaType
                 "Гавайская" -> /OrderPizza/SavePizzaType
 
-        # ----- Локальный интент сохранения типа -----
+        # ----- Сохранение типа -----
         state: SavePizzaType
             intent!: /choose_pizza
             q!: мясная
@@ -162,7 +159,7 @@ theme: /
             a: Борт: {{$session.order.crust_type}}.
             go!: /OrderPizza/AskAddress
 
-        # ----- Адрес (универсальный приёмник) -----
+        # ----- Адрес: устанавливаем флаг и уходим в приёмник -----
         state: AskAddress
             script:
                 $session.order.status = "waiting_address";
@@ -170,7 +167,7 @@ theme: /
             go!: /WaitInput
 
     # =========================
-    # АДРЕС — ПРИЁМНИК
+    # УНИВЕРСАЛЬНЫЙ ПРИЁМНИК АДРЕСА
     # =========================
     state: WaitInput
         q!: *
@@ -212,7 +209,6 @@ theme: /
     # =========================
     state: ConfirmOrder
         script:
-            # подсчёт стоимости
             var size = $session.order.pizza_size;
             var crust = $session.order.crust_type;
             var base = $global.pizza_prices[size] || 0;
@@ -234,7 +230,7 @@ theme: /
             "Изменить адрес" -> /OrderPizza/AskAddress
             "Отмена" -> /Cancel
 
-        # ----- Подтверждение (вложено!) -----
+        # ----- Подтверждение (вложено) -----
         state: PlaceOrder
             intent!: /confirm_yes
             q!: да
@@ -252,8 +248,7 @@ theme: /
     # =========================
     state: OrderInProgress
         a: Готовим вашу пиццу... 🍕
-        timeout: 3000
-        go!: /OrderReady
+        timeout: /OrderReady || interval = 3
 
     state: OrderReady
         a: Ваш заказ готов! Курьер выехал по адресу {{$session.order.address}}.
@@ -312,7 +307,7 @@ theme: /
         a: |
             Я умею:
             • принимать заказ пиццы
-            • выбирать размер, борт, топпинги
+            • выбирать размер и борт
             • оформлять доставку
             • менять заказ
             Напишите «хочу пиццу» или нажмите кнопку.
