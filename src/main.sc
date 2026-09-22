@@ -11,9 +11,7 @@ init:
 
 theme: /
 
-    # =========================
-    # ПРИВЕТСТВИЕ / НАЧАЛО
-    # =========================
+ 
     state: StartState
         q!: $regex</start>
         intent!: /start
@@ -36,9 +34,7 @@ theme: /
             "Помощь" -> /Help
             "Сбросить" -> /Reset
 
-    # =========================
-    # ЗАКАЗ — ВЛОЖЕННЫЕ СОСТОЯНИЯ
-    # =========================
+   
     state: OrderPizza
         intent!: /order_pizza
         script:
@@ -65,7 +61,7 @@ theme: /
                     $reactions.transition("/OrderPizza/AskPizzaType");
                 }
 
-        # ----- Спрашиваем тип -----
+        
         state: AskPizzaType
             a: Какую пиццу хотите?
             buttons:
@@ -75,7 +71,7 @@ theme: /
                 "Вегетарианская" -> /OrderPizza/SavePizzaType
                 "Гавайская" -> /OrderPizza/SavePizzaType
 
-        # ----- Сохранение типа -----
+        
         state: SavePizzaType
             intent!: /choose_pizza
             q!: мясная
@@ -93,7 +89,7 @@ theme: /
             a: {{$session.order.pizza_type}} — отличный выбор!
             go!: /OrderPizza/CheckSize
 
-        # ----- Проверка размера -----
+       
         state: CheckSize
             script:
                 if ($session.order.pizza_size) {
@@ -102,7 +98,7 @@ theme: /
                     $reactions.transition("/OrderPizza/AskSize");
                 }
 
-        # ----- Спрашиваем размер -----
+    
         state: AskSize
             a: Какой размер пиццы?
             buttons:
@@ -127,7 +123,7 @@ theme: /
             a: Размер {{$session.order.pizza_size}} — отлично!
             go!: /OrderPizza/CheckCrust
 
-        # ----- Проверка борта -----
+    
         state: CheckCrust
             script:
                 if ($session.order.crust_type) {
@@ -136,7 +132,7 @@ theme: /
                     $reactions.transition("/OrderPizza/AskCrust");
                 }
 
-        # ----- Спрашиваем борт -----
+       
         state: AskCrust
             a: Какой борт?
             buttons:
@@ -159,16 +155,14 @@ theme: /
             a: Борт: {{$session.order.crust_type}}.
             go!: /OrderPizza/AskAddress
 
-        # ----- Адрес: ставим флаг и уходим в приёмник -----
+        
         state: AskAddress
             script:
                 $session.order.status = "waiting_address";
             a: Куда доставить?
             go!: /WaitInput
 
-    # =========================
-    # УНИВЕРСАЛЬНЫЙ ПРИЁМНИК АДРЕСА
-    # =========================
+    
     state: WaitInput
         q!: *
         script:
@@ -176,9 +170,7 @@ theme: /
             $session.order.status = "draft";
             $reactions.transition("/AskPayment");
 
-    # =========================
-    # ОПЛАТА
-    # =========================
+    
     state: AskPayment
         a: Как будете оплачивать?
         buttons:
@@ -204,9 +196,7 @@ theme: /
         a: Способ оплаты: {{$session.order.payment_method}}.
         go!: /ConfirmOrder
 
-    # =========================
-    # ПОДТВЕРЖДЕНИЕ ЗАКАЗА
-    # =========================
+   
     state: ConfirmOrder
         script:
             var size = $session.order.pizza_size;
@@ -230,7 +220,7 @@ theme: /
             "Изменить адрес" -> /OrderPizza/AskAddress
             "Отмена" -> /Cancel
 
-        # ----- Подтверждение (вложено) -----
+        
         state: PlaceOrder
             intent!: /confirm_yes
             q!: да
@@ -243,11 +233,9 @@ theme: /
             a: Заказ оформлен! Мы позвоним в течение 5 минут.
             go!: /OrderInProgress
 
-    # =========================
-    # ИМИТАЦИЯ ВЫПОЛНЕНИЯ ЗАКАЗА
-    # =========================
+   
     state: OrderInProgress
-        a: Готовим вашу пиццу... 🍕
+        a: Готовим вашу пиццу... 
         timeout: /OrderReady || interval = "3s"
 
     state: OrderReady
@@ -255,9 +243,7 @@ theme: /
         image: https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/320px-Eq_it-na_pizza-margherita_sep2005_sml.jpg
         go!: /Thanks
 
-    # =========================
-    # ИЗМЕНЕНИЕ ЗАКАЗА
-    # =========================
+    
     state: ChangeSize
         intent!: /change_size
         a: Какой размер хотите?
@@ -267,19 +253,15 @@ theme: /
             "30 см" -> /OrderPizza/SaveSize
             "35 см" -> /OrderPizza/SaveSize
 
-    # =========================
-    # ФИНАЛ — БЕЗ go! (разрываем цикл)
-    # =========================
+    
     state: Thanks
-        a: Спасибо за заказ! Хорошего дня 🍕
+        a: Спасибо за заказ! Хорошего дня 
         script:
             $session.order = null;
             $jsapi.stopSession();
-        # никаких go! — ждём действий пользователя
+        
 
-    # =========================
-    # СБРОС — БЕЗ go! (разрываем цикл)
-    # =========================
+  
     state: Reset
         intent!: /reset
         q!: заново
@@ -289,11 +271,9 @@ theme: /
             $session.order = null;
             $jsapi.stopSession();
         a: Начинаем заново. Напишите «привет».
-        # никаких go! — ждём «привет» от пользователя
+      
 
-    # =========================
-    # ОТМЕНА
-    # =========================
+ 
     state: Cancel
         intent!: /cancel
         q!: отмена
@@ -303,11 +283,8 @@ theme: /
         script:
             $session.order = null;
             $jsapi.stopSession();
-        # никаких go! — ждём действий пользователя
+        
 
-    # =========================
-    # ПОМОЩЬ / СПАСИБО / ПОКА
-    # =========================
     state: Help
         intent!: /help
         a: |
@@ -324,8 +301,8 @@ theme: /
         intent!: /thanks
         q!: спасибо
         q!: благодарю
-        a: Пожалуйста! Всегда рад помочь 🍕
-        # без go! — не зацикливаем
+        a: Пожалуйста! Всегда рад помочь 
+       
 
     state: Bye
         intent!: /bye
@@ -334,11 +311,9 @@ theme: /
         a: До свидания! Ждём вас снова.
         script:
             $jsapi.stopSession();
-        # без go! — сессия завершена
+        
 
-    # =========================
-    # NO MATCH
-    # =========================
+    
     state: NoMatch
         event!: noMatch
         if: !($session.order && $session.order.status == "waiting_address")
