@@ -159,7 +159,7 @@ theme: /
             a: Борт: {{$session.order.crust_type}}.
             go!: /OrderPizza/AskAddress
 
-        # ----- Адрес: устанавливаем флаг и уходим в приёмник -----
+        # ----- Адрес: ставим флаг и уходим в приёмник -----
         state: AskAddress
             script:
                 $session.order.status = "waiting_address";
@@ -248,7 +248,7 @@ theme: /
     # =========================
     state: OrderInProgress
         a: Готовим вашу пиццу... 🍕
-        timeout: /OrderReady || interval = 3
+        timeout: /OrderReady || interval = "3s"
 
     state: OrderReady
         a: Ваш заказ готов! Курьер выехал по адресу {{$session.order.address}}.
