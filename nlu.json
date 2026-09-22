@@ -23,6 +23,254 @@
     }
   },
   "intents" : [ {
+    "path" : "/order_pizza",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "хочу пиццу"
+    }, {
+      "text" : "закажи пиццу"
+    }, {
+      "text" : "можно пиццу"
+    }, {
+      "text" : "хочу заказать пиццу"
+    }, {
+      "text" : "давай закажем пиццу"
+    }, {
+      "text" : "пиццу хочу"
+    }, {
+      "text" : "хочу @pizza_type"
+    }, {
+      "text" : "хочу @pizza_type @pizza_size"
+    }, {
+      "text" : "закажи @pizza_type"
+    }, {
+      "text" : "пицца @pizza_type @pizza_size"
+    }, {
+      "text" : "хочу @pizza_size см @pizza_type"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ {
+      "name" : "pizza_type",
+      "entity" : "pizza_type",
+      "required" : true,
+      "prompts" : [ "Какую пиццу вы хотите ?" ],
+      "array" : false
+    }, {
+      "name" : "pizza_size",
+      "entity" : "pizza_size",
+      "required" : true,
+      "prompts" : [ "Какой размер ?" ],
+      "array" : false
+    } ],
+    "priority" : 0
+  }, {
+    "path" : "/add_topping",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "добавь @topping"
+    }, {
+      "text" : "с @topping"
+    }, {
+      "text" : "ещё @topping"
+    }, {
+      "text" : "хочу с @topping"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ {
+      "name" : "topping",
+      "entity" : "topping",
+      "required" : true,
+      "prompts" : [ ],
+      "array" : false
+    } ],
+    "priority" : 0
+  }, {
+    "path" : "/confirm_no",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "нет"
+    }, {
+      "text" : "неверно"
+    }, {
+      "text" : "не то"
+    }, {
+      "text" : "переделать"
+    }, {
+      "text" : "не так"
+    }, {
+      "text" : "нет, не то"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
+    "path" : "/cancel",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "отмена"
+    }, {
+      "text" : "отменить"
+    }, {
+      "text" : "стоп"
+    }, {
+      "text" : "не надо"
+    }, {
+      "text" : "передумал"
+    }, {
+      "text" : "отмени заказ"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
+    "path" : "/set_payment",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "@payment_method"
+    }, {
+      "text" : "оплата @payment_method"
+    }, {
+      "text" : "оплачу @payment_method"
+    }, {
+      "text" : "буду платить @payment_method"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ {
+      "name" : "payment_method",
+      "entity" : "payment_method",
+      "required" : true,
+      "prompts" : [ "Как будете оплачивать?" ],
+      "array" : false
+    } ],
+    "priority" : 0
+  }, {
+    "path" : "/confirm_yes",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "да"
+    }, {
+      "text" : "верно"
+    }, {
+      "text" : "подтверждаю"
+    }, {
+      "text" : "точно"
+    }, {
+      "text" : "ага"
+    }, {
+      "text" : "всё верно"
+    }, {
+      "text" : "да, всё правильно"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
+    "path" : "/change_size",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "поменяй размер"
+    }, {
+      "text" : "изменить размер"
+    }, {
+      "text" : "другой размер"
+    }, {
+      "text" : "хочу другой размер"
+    }, {
+      "text" : "не тот размер"
+    }, {
+      "text" : "поменяй на @pizza_size"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ {
+      "name" : "pizza_size",
+      "entity" : "pizza_size",
+      "required" : false,
+      "prompts" : [ ],
+      "array" : false
+    } ],
+    "priority" : 0
+  }, {
+    "path" : "/reset",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "начать заново"
+    }, {
+      "text" : "сбросить"
+    }, {
+      "text" : "с начала"
+    }, {
+      "text" : "очистить"
+    }, {
+      "text" : "заново"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
+    "path" : "/thanks",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "спасибо"
+    }, {
+      "text" : "благодарю"
+    }, {
+      "text" : "спс"
+    }, {
+      "text" : "спасибо большое"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
+    "path" : "/bye",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "до свидания"
+    }, {
+      "text" : "до встречи"
+    }, {
+      "text" : "бай"
+    }, {
+      "text" : "пока"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
     "path" : "/пока",
     "enabled" : true,
     "shared" : false,
@@ -39,10 +287,21 @@
     "shared" : false,
     "phrases" : [ {
       "text" : "привет"
+    }, {
+      "text" : "здравствуйте"
+    }, {
+      "text" : "начать"
+    }, {
+      "text" : "старт"
+    }, {
+      "text" : "хочу заказать"
+    }, {
+      "text" : "привет бот"
     } ],
     "classificationRules" : {
       "refs" : [ ]
     },
+    "patterns" : [ ],
     "priority" : 0
   }, {
     "path" : "/Новый интент",
@@ -52,10 +311,83 @@
       "refs" : [ ]
     },
     "priority" : 0
+  }, {
+    "path" : "/choose_size",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "@pizza_size"
+    }, {
+      "text" : "хочу @pizza_size"
+    }, {
+      "text" : "размер @pizza_size"
+    }, {
+      "text" : "@pizza_size см"
+    }, {
+      "text" : "давай @pizza_size"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ {
+      "name" : "pizza_size",
+      "entity" : "pizza_size",
+      "required" : true,
+      "prompts" : [ "Какой размер?" ],
+      "array" : false
+    } ],
+    "priority" : 0
+  }, {
+    "path" : "/choose_crust",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "@crust_type"
+    }, {
+      "text" : "с @crust_type бортом"
+    }, {
+      "text" : "хочу @crust_type"
+    }, {
+      "text" : "@crust_type борт"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ {
+      "name" : "crust_type",
+      "entity" : "crust_type",
+      "required" : true,
+      "prompts" : [ "Какой борт?" ],
+      "array" : false
+    } ],
+    "priority" : 0
+  }, {
+    "path" : "/set_address",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "@duckling.address"
+    }, {
+      "text" : "доставьте на @duckling.address"
+    }, {
+      "text" : "адрес @duckling.address"
+    }, {
+      "text" : "мой адрес @duckling.address"
+    }, {
+      "text" : "привезите на @duckling.address"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ ],
+    "priority" : 0
   } ],
   "entities" : [ {
     "entity" : {
-      "name" : "pizza",
+      "name" : "pizza_type",
       "enabled" : true,
       "shared" : false,
       "type" : "annotation",
@@ -69,47 +401,32 @@
     },
     "records" : [ {
       "type" : "synonyms",
-      "rule" : [ "Пиццы" ],
-      "value" : ""
-    }, {
-      "type" : "synonyms",
-      "rule" : [ "Еда" ],
-      "value" : ""
-    }, {
-      "type" : "synonyms",
-      "rule" : [ "Пицца" ],
-      "value" : ""
-    } ]
-  }, {
-    "entity" : {
-      "name" : "type_pizza",
-      "enabled" : true,
-      "shared" : false,
-      "type" : "annotation",
-      "priority" : 1,
-      "noSpelling" : true,
-      "noMorph" : false,
-      "phoneticSearch" : false,
-      "fuzzySearch" : false,
-      "client" : false,
-      "hidden" : false
-    },
-    "records" : [ {
-      "type" : "synonyms",
-      "rule" : [ "грибная" ],
-      "value" : ""
-    }, {
-      "type" : "synonyms",
-      "rule" : [ "сырная" ],
+      "rule" : [ "грибная", "грибная, с грибами, грибочки" ],
       "value" : ""
     }, {
       "type" : "synonyms",
       "rule" : [ "мясная" ],
       "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "сырная", "сырная, с сыром, четыре сыра, 4 сыра, чи́з" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "маргарита", "маргарита, маргарита с томатами" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "гавайская", "гавайская, с ананасом, с курицей и ананасом" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "вегетарианская", "вегетарианская, овощная, без мяса" ],
+      "value" : ""
     } ]
   }, {
     "entity" : {
-      "name" : "size",
+      "name" : "payment_method",
       "enabled" : true,
       "shared" : false,
       "type" : "annotation",
@@ -123,15 +440,116 @@
     },
     "records" : [ {
       "type" : "synonyms",
-      "rule" : [ "35 см" ],
+      "rule" : [ "онлайн", "онлайн, онлайн-оплата, по ссылке, сбп" ],
       "value" : ""
     }, {
       "type" : "synonyms",
-      "rule" : [ "25 см" ],
+      "rule" : [ "карта", "карта, картой, банковская карта, visa, mastercard, мир" ],
       "value" : ""
     }, {
       "type" : "synonyms",
-      "rule" : [ "15 см" ],
+      "rule" : [ "наличные", "наличные, наличкой, кэш" ],
+      "value" : ""
+    } ]
+  }, {
+    "entity" : {
+      "name" : "topping",
+      "enabled" : true,
+      "shared" : false,
+      "type" : "annotation",
+      "priority" : 1,
+      "noSpelling" : true,
+      "noMorph" : false,
+      "phoneticSearch" : false,
+      "fuzzySearch" : false,
+      "client" : false,
+      "hidden" : false
+    },
+    "records" : [ {
+      "type" : "synonyms",
+      "rule" : [ "сыр", "сыр, сырок, моцарелла, чеддер" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "оливки", "оливки, маслины" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "бекон" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "грибы", "грибы, шампиньоны" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "колбаса", "колбаса, салями, пепперони" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "перец", "перец, болгарский перец" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "ананас" ],
+      "value" : ""
+    } ]
+  }, {
+    "entity" : {
+      "name" : "pizza_size",
+      "enabled" : true,
+      "shared" : false,
+      "type" : "annotation",
+      "priority" : 1,
+      "noSpelling" : true,
+      "noMorph" : false,
+      "phoneticSearch" : false,
+      "fuzzySearch" : false,
+      "client" : false,
+      "hidden" : false
+    },
+    "records" : [ {
+      "type" : "synonyms",
+      "rule" : [ "30 см", "30, 30см, 30 см, большая" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "25 см", "25, 25см, 25 см, средняя, medium" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "15 см", "15, 15см, 15 см, маленькая, small" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "35 см", "35, 35см, 35 см, огромная, large" ],
+      "value" : ""
+    } ]
+  }, {
+    "entity" : {
+      "name" : "crust_type",
+      "enabled" : true,
+      "shared" : false,
+      "type" : "annotation",
+      "priority" : 1,
+      "noSpelling" : true,
+      "noMorph" : false,
+      "phoneticSearch" : false,
+      "fuzzySearch" : false,
+      "client" : false,
+      "hidden" : false
+    },
+    "records" : [ {
+      "type" : "synonyms",
+      "rule" : [ "обычный", "обычный, без борта, классический, тонкий" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "колбасный", "колбасный, с колбасой по краю" ],
+      "value" : ""
+    }, {
+      "type" : "synonyms",
+      "rule" : [ "сырный", "сырный, сырный борт, с сыром по краю" ],
       "value" : ""
     } ]
   } ],
