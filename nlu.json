@@ -148,6 +148,16 @@
       "text" : "оплачу @payment_method"
     }, {
       "text" : "буду платить @payment_method"
+    }, {
+      "text" : "картой"
+    }, {
+      "text" : "карта"
+    }, {
+      "text" : "наличными"
+    }, {
+      "text" : "наличные"
+    }, {
+      "text" : "онлайн"
     } ],
     "classificationRules" : {
       "refs" : [ ]
